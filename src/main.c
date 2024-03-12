@@ -30,19 +30,34 @@ Queue* queue_from_array (int* array, int length) {
 }
 
 void enqueue (Queue* queue, int val) {
+  if (queue->tail == NULL) {
+    queue->head = new_list(val);
+    queue->tail = queue->head;
+    return;
+  }
   ListNode* new_node = new_list(val);
   queue->tail->next = new_node;
   queue->tail = queue->tail->next;
   queue->length = queue->length + 1;
 } 
 
-void deque (Queue* queue) {
+int deque (Queue* queue) {
+  if (queue->head == NULL) {return -1;}
+  ListNode* head = queue->head;
   queue->head = queue->head->next;
   queue->length = queue->length - 1;
-  // *list = *(list->next);
+  int value = head->val;
+  free(head);
+  if (queue->length == 0) {
+    queue->tail = NULL;
+  }
+  return value;
 }
 
 int peek (Queue* queue) {
+  if (queue->head == NULL) {
+    return -1;
+  }
   return queue->head->val;
 }
 
@@ -62,9 +77,10 @@ int main(int argc, char **argv) {
   enqueue(queue, 537386);
   enqueue(queue, -444837);
   // printf("%lu\n", queue->length);
-  deque(queue);
-  deque(queue);
-  // printf("%lu\n", queue->length);
+  int a = deque(queue);
+  int b = deque(queue);
+  printf("%d\n", a);
+  printf("%d\n", b);
   print_queue(queue);
 
 }
