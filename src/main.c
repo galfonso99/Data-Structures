@@ -5,29 +5,49 @@
 #include <stdlib.h>
 #include "linked_list.h"
 
-ListNode* head_and_tail_from_array (ListNode* list, int* array, int length) {
+typedef struct {
+  size_t length;
+  ListNode* head;
+  ListNode* tail;
+} Queue ;
+
+Queue* queue_from_array (int* array, int length) {
   if (length == 0) {return NULL;}
-  list->val = array[0];
+  ListNode* list = new_list(array[0]);
+  ListNode* head = list;
   for (int i = 1; i < length; i++) {
     ListNode* next_node = new_list(-1);
     list->next = next_node;
     list = list->next;
     list->val = array[i];
   }
-  return list;
+  ListNode* tail = list;
+  Queue* queue = malloc(sizeof(Queue)); 
+  queue->length = length;
+  queue->head = head;
+  queue->tail = tail;
+  return queue;
 }
 
-void enqueue (ListNode **tail, int val) {
-  (*tail)->next = new_list(val);
-  (*tail) = (*tail)->next;
+void enqueue (Queue* queue, int val) {
+  ListNode* new_node = new_list(val);
+  queue->tail->next = new_node;
+  queue->tail = queue->tail->next;
+  queue->length = queue->length + 1;
 } 
 
-void deque (ListNode* list) {
-  *list = *(list->next);
+void deque (Queue* queue) {
+  queue->head = queue->head->next;
+  queue->length = queue->length - 1;
+  // *list = *(list->next);
 }
 
-int peek (ListNode* list) {
-  return list->val;
+int peek (Queue* queue) {
+  return queue->head->val;
+}
+
+void print_queue (Queue* queue) {
+  print_list(queue->head);
 }
 
 int main(int argc, char **argv) {
@@ -35,13 +55,16 @@ int main(int argc, char **argv) {
   int array[15] = {45, 23, 62,  58, 38, 8543, 734, 85,
                    34, 54, 856, 27, 55, 9375, 845};
   int length = sizeof(array) / sizeof(int);
-  ListNode* list = new_list(0);
   // head_and_tail_from_array returns tail and modifies list in place
-  ListNode* tail = head_and_tail_from_array(list, array, length);
+  Queue* queue = queue_from_array(array, length);
   // print_list(tail);
-  // printf("%d\n", peek(list));
-  enqueue(&tail, 537386);
-  enqueue(&tail, -444837);
-  deque(list);
-  print_list(list);
+  // printf("%d\n", peek(queue));
+  enqueue(queue, 537386);
+  enqueue(queue, -444837);
+  // printf("%lu\n", queue->length);
+  deque(queue);
+  deque(queue);
+  // printf("%lu\n", queue->length);
+  print_queue(queue);
+
 }
