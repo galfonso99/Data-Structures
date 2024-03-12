@@ -5,30 +5,26 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-int two_crystal_balls(int* stories, int length, int breaking_point) {
-  int jump = sqrt(length);
-  int floor = -1;
-  int i = jump;
-  for (; i < length; i+=jump) {
-    if (stories[i] >= breaking_point) {break;}
-  }
-  i -= jump;
-  for (int j = 0; j <= jump; j++) {
-    if (stories[i + j] >= breaking_point) {
-      floor = i + j;
-      break;
+void bubble_sort (int* array, int length) {
+  for (int j = 0; j < length - 1; j++) {
+    for (int i = 0; i < length - j - 1; i++) {
+      if (array[i] > array[i+1]) {
+        array[i] ^= array[i+1];
+        array[i+1] ^= array[i];
+        array[i] ^= array[i+1];
+      }
     }
   }
-  return floor;
 }
 
 int main(int argc, char **argv) {
-  int array[15] = {4,6,8, 12, 14, 15, 16, 17, 25, 27, 35, 46, 52, 55, 62};
+  // int array[15] = {4,6,8, 12, 14, 15, 16, 17, 25, 27, 35, 46, 52, 55, 62};
+  int array[15] = {45,23,62,58,38,8543,734,85,34,54,856,27,55,9375,845};
   int length = sizeof(array) / sizeof(int);
-  for (int j = 0; j < length; j++) {
-    printf("%d\n", array[j]);
-  };
-  int index = two_crystal_balls(array, length, 12);
-  printf("%d\n", index);
+  bubble_sort(array, length);
+  for (int i = 0; i < length; i++) {
+    printf("%d\n", array[i]);
+  }
+  // printf("%d\n", index);
 }
 
