@@ -8,61 +8,54 @@
 typedef struct {
   size_t length;
   ListNode* head;
-  ListNode* tail;
-} Queue ;
+} Stack ;
 
-Queue* queue_from_array (int* array, int length) {
+Stack* stack_from_array (int* array, int length) {
   if (length == 0) {return NULL;}
   ListNode* list = new_list(array[0]);
   ListNode* head = list;
   for (int i = 1; i < length; i++) {
-    ListNode* next_node = new_list(-1);
-    list->next = next_node;
-    list = list->next;
-    list->val = array[i];
+    ListNode* new_head = new_list(array[i]);
+    new_head->next = list;
+    list = new_head;
   }
   ListNode* tail = list;
-  Queue* queue = malloc(sizeof(Queue)); 
-  queue->length = length;
-  queue->head = head;
-  queue->tail = tail;
-  return queue;
+  Stack* stack = malloc(sizeof(Stack)); 
+  stack->length = length;
+  stack->head = list;
+  return stack;
 }
 
-void enqueue (Queue* queue, int val) {
-  if (queue->tail == NULL) {
-    queue->head = new_list(val);
-    queue->tail = queue->head;
+void push (Stack* stack, int val) {
+  if (stack->head == NULL) {
+    stack->head = new_list(val);
     return;
   }
   ListNode* new_node = new_list(val);
-  queue->tail->next = new_node;
-  queue->tail = queue->tail->next;
-  queue->length = queue->length + 1;
-} 
+  new_node->next = stack->head;
+  stack->head = new_node;
+  stack->length = stack->length + 1;
+}
 
-int deque (Queue* queue) {
-  if (queue->head == NULL) {return -1;}
-  ListNode* head = queue->head;
-  queue->head = queue->head->next;
-  queue->length = queue->length - 1;
+int pop (Stack* stack) {
+  if (stack->head == NULL) {return -1;}
+  ListNode* head = stack->head;
+  stack->head = stack->head->next;
+  stack->length = stack->length - 1;
   int value = head->val;
   free(head);
-  if (queue->length == 0) {
-    queue->tail = NULL;
-  }
   return value;
 }
 
-int peek (Queue* queue) {
-  if (queue->head == NULL) {
+int peek (Stack* stack) {
+  if (stack->head == NULL) {
     return -1;
   }
-  return queue->head->val;
+  return stack->head->val;
 }
 
-void print_queue (Queue* queue) {
-  print_list(queue->head);
+void print_stack (Stack* stack) {
+  print_list(stack->head);
 }
 
 int main(int argc, char **argv) {
@@ -71,16 +64,10 @@ int main(int argc, char **argv) {
                    34, 54, 856, 27, 55, 9375, 845};
   int length = sizeof(array) / sizeof(int);
   // head_and_tail_from_array returns tail and modifies list in place
-  Queue* queue = queue_from_array(array, length);
-  // print_list(tail);
-  // printf("%d\n", peek(queue));
-  enqueue(queue, 537386);
-  enqueue(queue, -444837);
-  // printf("%lu\n", queue->length);
-  int a = deque(queue);
-  int b = deque(queue);
-  printf("%d\n", a);
-  printf("%d\n", b);
-  print_queue(queue);
+  Stack* stack = stack_from_array(array, length);
+  int val = pop(stack);
+  push(stack, 14555);
+  print_stack(stack);
+  printf("%d\n", peek(stack));
 
 }
