@@ -33,19 +33,19 @@ void my_array_free(Array *array) {
   free(array);
 }
 
-// int run_my_array() {
-//   Array *newArray = my_array_new(10);
-//   int *buffer = newArray->start;
-//   for (int i = 0; i < 10; i++) {
-//     my_array_set_index(newArray, i, i * 2);
-//   };
-//   for (int j = 0; j < 10; j++) {
-//     int val = my_array_get_index(newArray, j);
-//     printf("%d\n", val);
-//   };
-//   printf("Size: %d\n", my_array_get_len(newArray));
-//
-//   printf("Val: %d\n", buffer[3]);
-//   my_array_free(newArray);
-//   return 0;
-// }
+int run_my_array() {
+  Array *newArray = my_array_new(10);
+  int *buffer = newArray->start;
+  for (int i = 0; i < 10; i++) {
+    my_array_set_index(newArray, i, i * 2);
+  };
+  for (int j = 0; j < 10; j++) {
+    int val = my_array_get_index(newArray, j);
+    printf("%d\n", val);
+  };
+  printf("Size: %d\n", my_array_get_len(newArray));
+
+  printf("Val: %d\n", buffer[3]);
+  my_array_free(newArray);
+  return 0;
+}
