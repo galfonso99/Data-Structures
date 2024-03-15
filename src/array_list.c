@@ -67,7 +67,7 @@ int deque(ArrayList *array_list) {
   return val;
 }
 
-int driver(int argc, char **argv) {
+int array_list_driver() {
   int arr[4] = {45, 23, 62, 58};
   int length = sizeof(arr) / sizeof(int);
   // int arr2[8] = {0,0,0,0,0,0,0,0};

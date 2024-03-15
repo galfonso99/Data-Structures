@@ -27,4 +27,6 @@ void enqueue(ArrayList *array_list, int val);
 
 int deque(ArrayList *array_list); 
 
+int array_list_driver();
+
 #endif
