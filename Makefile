@@ -1,3 +1,3 @@
-main: src/main.c src/ring_buffer.c
-	gcc -o main src/main.c src/ring_buffer.c -I ./src
+main: src/main.c 
+	gcc -o main src/main.c -I ./src
 
