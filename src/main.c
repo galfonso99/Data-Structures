@@ -27,9 +27,8 @@ typedef struct {
 } Layout;
 
 bool walk (Layout *maze, char wall, Point* end_point, bool **seen, Point **path, Point curr) {
-
     if (curr.x < 0 || curr.x >= maze->width 
-             || curr.y < 0 || curr.y >= maze->length) {
+        || curr.y < 0 || curr.y >= maze->length) {
         return false;
     } else if (maze->maze[curr.y][curr.x] == wall) {
         return false;
@@ -49,9 +48,9 @@ bool walk (Layout *maze, char wall, Point* end_point, bool **seen, Point **path,
         int y = DIRS[i][0], x = DIRS[i][1]; 
 
         if (walk(maze, wall, end_point, seen, path, (Point) {
-         .x = curr.x + x,
-         .y = curr.y + y,
-         .length = curr.length + 1
+            .x = curr.x + x,
+            .y = curr.y + y,
+            .length = curr.length + 1
         })) {
             return true;
         };
@@ -79,20 +78,31 @@ Point * solve (Layout *maze, char wall, Point *start, Point *end) {
 }
 
 int main(int argc, char **argv) {
-    char wall = 'x';
-    int length = 6;
-    int width = 12;
-    char *maze[] = {"xxxxxxxxxx x",
-                    "x        x x",
-                    "x        x x",
-                    "x xxxxxxxx x",
-                    "x          x",
-                    "x xxxxxxxxxx"};
-    Point start = {.x = 10, .y = 0};
-    Point end = {.x = 1, .y = 5};
-    Layout layout = {.length = length, .width = width, .maze = (char**) maze};
+    char wall = '#';
+    // char *maze[] = {"xxxxxxxxxx x",
+    //                 "x        x x",
+    //                 "x        x x",
+    //                 "x xxxxxxxx x",
+    //                 "x          x",
+    //                 "x xxxxxxxxxx"};
+    int length = 12;
+    int width = 14;
+    char **maze = (char*[]) {"##############",
+                             "#____________#",
+                             "#_##########_#",
+                             "#_#___#____#_#",
+                             "#_#_#_#_##_#_#",
+                             "#_#_#___#__#_#",
+                             "#_#_#####_##_#",
+                             "#_#____##^##_#",
+                             "#_#__#_###_#_#",
+                             "#_####_##$##_#",
+                             "#______##____#",
+                             "##############"};
+    Point start = {.x = 9, .y = 7};
+    Point end = {.x = 9, .y = 9};
+    Layout layout = {.length = length, .width = width, .maze = maze};
     Point *path = solve(&layout, wall, &start, &end);
-    // solve(&layout, wall, &start, &end);
     for (int i = 0; i < arrlen(path); i++) {
         printf("{%d, %d}\n", path[i].x, path[i].y);
     }
