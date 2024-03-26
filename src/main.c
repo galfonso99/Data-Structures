@@ -15,6 +15,7 @@ int partition (int *arr, int lo, int hi) {
     for (int i = lo; i < hi; i++) {
         if (arr[i] <= pivot) {
             idx++;
+            if (i == idx) continue; // Dont swap if they are the same index
             int curr = arr[i];
             arr[i] = arr[idx];
             arr[idx] = curr;
