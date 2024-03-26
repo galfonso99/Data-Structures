@@ -8,37 +8,38 @@
 // #include "stb_ds.h"
 
 // Implementing Quicksort
-void split (int *arr, int lo, int hi) {
-    if (hi - lo < 1)  {
-        return;
-    }
+int partition (int *arr, int lo, int hi) {
     int pivot = arr[hi];
-    int count = lo;
-    // Skip until you find a value that is >= pivot
-    while (arr[count] < pivot) {
-        count++;
-    }
-    int swap_idx = count;
-    // Swap every larger value with a smaller value until all the smaller values are at the front
-    for (int i = count + 1; i < hi + 1; i++) {
-        if (arr[i] < pivot) {
-            int current = arr[i];
-            arr[i] = arr[swap_idx];
-            arr[swap_idx] = current;
-            swap_idx++;
+    int idx = lo - 1;   // Outside of the valid range
+
+    for (int i = lo; i < hi; i++) {
+        if (arr[i] <= pivot) {
+            idx++;
+            int curr = arr[i];
+            arr[i] = arr[idx];
+            arr[idx] = curr;
         }
     }
-    // Place the pivot right after the last value that is lesser than it
-    arr[hi] = arr[swap_idx];
-    arr[swap_idx] = pivot;
-    int pivot_idx = swap_idx;
-    // Repeat at the left side and right side of the pivot
-    split(arr, lo, pivot_idx - 1);
-    split(arr, pivot_idx + 1, hi);
+    idx++;
+    arr[hi] = arr[idx];
+    arr[idx] = pivot;
+
+    return idx;
+}
+
+void qs (int *arr, int lo, int hi) {
+    if (lo >= hi) {
+        return;
+    }
+
+    int pivot_idx = partition(arr, lo, hi);
+
+    qs(arr, lo, pivot_idx - 1);
+    qs(arr, pivot_idx + 1, hi);
 }
 
 void quicksort (int *arr, int length) {
-    split(arr, 0, length-1);
+    qs(arr, 0, length-1);
 }
 
 int main (int argc, char **argv) {
