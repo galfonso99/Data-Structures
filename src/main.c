@@ -12,27 +12,27 @@ void split (int *arr, int lo, int hi) {
     if (hi - lo < 1)  {
         return;
     }
-    int middle = lo + (hi - lo) / 2;
     int pivot = arr[hi];
-    int pivot_idx = hi;
-    int swappable_idx = -1;
-    for (int i = lo; i < hi + 1; i++) {
-        if (swappable_idx >= 0 && arr[i] < pivot) {
-            int tmp = arr[i];
-            arr[i] = arr[swappable_idx];
-            arr[swappable_idx] = tmp;
-            swappable_idx++;
-        }
-        if (swappable_idx == -1 && arr[i] >= pivot) {
-            swappable_idx = i;
+    int count = lo;
+    // Skip until you find a value that is >= pivot
+    while (arr[count] < pivot) {
+        count++;
+    }
+    int swap_idx = count;
+    // Swap every larger value with a smaller value until all the smaller values are at the front
+    for (int i = count + 1; i < hi + 1; i++) {
+        if (arr[i] < pivot) {
+            int current = arr[i];
+            arr[i] = arr[swap_idx];
+            arr[swap_idx] = current;
+            swap_idx++;
         }
     }
-    // Place the pivot after the last value that is lesser than it
-    if (swappable_idx >= lo) {
-        arr[hi] = arr[swappable_idx];
-        arr[swappable_idx] = pivot;
-        pivot_idx = swappable_idx;
-    }
+    // Place the pivot right after the last value that is lesser than it
+    arr[hi] = arr[swap_idx];
+    arr[swap_idx] = pivot;
+    int pivot_idx = swap_idx;
+    // Repeat at the left side and right side of the pivot
     split(arr, lo, pivot_idx - 1);
     split(arr, pivot_idx + 1, hi);
 }
