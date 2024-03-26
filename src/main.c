@@ -5,105 +5,62 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "stb_ds.h"
+// #include "stb_ds.h"
 
-const int DIRS[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
-
-typedef struct Point {
-    int x;
-    int y;
-    int length;
-} Point;
-
-typedef struct {
-    char* ch;
-    struct Point* pos;
-} Spot;
-
-typedef struct {
-    int length;
-    int width;
-    char** maze;
-} Layout;
-
-bool walk (Layout *maze, char wall, Point* end_point, bool **seen, Point **path, Point curr) {
-    if (curr.x < 0 || curr.x >= maze->width 
-        || curr.y < 0 || curr.y >= maze->length) {
-        return false;
-    } else if (maze->maze[curr.y][curr.x] == wall) {
-        return false;
-    } else if (seen[curr.y][curr.x]) {
-        return false;
-    } else if (curr.x == end_point->x && curr.y == end_point->y) {
-        arrput(*path, curr);
-        return true;
+// Implementing Quicksort
+void split (int *arr, int lo, int hi) {
+    if (hi - lo < 1)  {
+        return;
     }
-
-    // Pre recursion
-    seen[curr.y][curr.x] = true;
-    arrput(*path, curr);
-
-    // Recurse
-    for (int i = 0; i < 4; i++) {
-        int y = DIRS[i][0], x = DIRS[i][1]; 
-
-        if (walk(maze, wall, end_point, seen, path, (Point) {
-            .x = curr.x + x,
-            .y = curr.y + y,
-            .length = curr.length + 1
-        })) {
-            return true;
-        };
-    }
-    // Post recursion
-    arrpop(*path);
-    return false;
-}
-
-Point * solve (Layout *maze, char wall, Point *start, Point *end) {
-    int length = maze->length;
-    int width = maze->width;
-    bool **seen = calloc(length, sizeof *seen);
-    for (int i = 0; i < length; i++) {
-        seen[i] = calloc(width, sizeof *(seen[i]));
-    }
-    for (int i = 0; i < length; i++) {
-        for (int j = 0; j < width; j++) {
-            seen[i][j] = false;
+    int middle = lo + (hi - lo) / 2;
+    int pivot = arr[hi];
+    int pivot_idx = hi;
+    int swappable_idx = -1;
+    for (int i = lo; i < hi + 1; i++) {
+        if (swappable_idx >= 0 && arr[i] < pivot) {
+            int tmp = arr[i];
+            arr[i] = arr[swappable_idx];
+            arr[swappable_idx] = tmp;
+            swappable_idx++;
+        }
+        if (swappable_idx == -1 && arr[i] >= pivot) {
+            swappable_idx = i;
         }
     }
-    Point *path = NULL;
-    walk(maze, wall, end, seen, &path, *start);
-    return path;
+    // Place the pivot after the last value that is lesser than it
+    if (swappable_idx >= lo) {
+        arr[hi] = arr[swappable_idx];
+        arr[swappable_idx] = pivot;
+        pivot_idx = swappable_idx;
+    }
+    split(arr, lo, pivot_idx - 1);
+    split(arr, pivot_idx + 1, hi);
 }
 
-int main(int argc, char **argv) {
-    char wall = '#';
-    // char *maze[] = {"xxxxxxxxxx x",
-    //                 "x        x x",
-    //                 "x        x x",
-    //                 "x xxxxxxxx x",
-    //                 "x          x",
-    //                 "x xxxxxxxxxx"};
-    int length = 12;
-    int width = 14;
-    char **maze = (char*[]) {"##############",
-                             "#____________#",
-                             "#_##########_#",
-                             "#_#___#____#_#",
-                             "#_#_#_#_##_#_#",
-                             "#_#_#___#__#_#",
-                             "#_#_#####_##_#",
-                             "#_#____##^##_#",
-                             "#_#__#_###_#_#",
-                             "#_####_##$##_#",
-                             "#______##____#",
-                             "##############"};
-    Point start = {.x = 9, .y = 7};
-    Point end = {.x = 9, .y = 9};
-    Layout layout = {.length = length, .width = width, .maze = maze};
-    Point *path = solve(&layout, wall, &start, &end);
-    for (int i = 0; i < arrlen(path); i++) {
-        printf("{%d, %d}\n", path[i].x, path[i].y);
+void quicksort (int *arr, int length) {
+    split(arr, 0, length-1);
+}
+
+int main (int argc, char **argv) {
+    int array[15] = {45, 23, 62,  58, 38, 8543, 734, 85,
+                   34, 54, 856, 27, 55, 9375, 845};
+    // int array[7] = {9, 3, 7, 4, 69, 420, 42};
+    int length = sizeof(array) / sizeof(int);
+    int arr[5] = {45, 23, 62, 58, 67};
+    int arr2[7] = {78, 36, 654, 23, 53, 667, 6643};
+    int len1 = sizeof(arr) / sizeof(int);
+    int len2 = sizeof(arr2) / sizeof(int);  
+    quicksort(array, length);
+    for (int i = 0; i < length; i++) {
+        printf("%d\n", array[i]);
     }
 }
+
+    // printf("%d %d %d\n", middle, lo, hi);
+    // printf("Pivot: %d\n", pivot);
+    // printf("swappable_idx: %d\n", swappable_idx);
+    // printf("Low: %d\n", lo);
+    // for (int i = lo; i < hi + 1; i++) {
+    //     printf("%d\n", arr[i]);
+    // }
+    // printf("\n");
