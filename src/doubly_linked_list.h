@@ -13,9 +13,40 @@ struct dl_list_node {
 };
 typedef struct dl_list_node dl_list_node;
 
-dl_list_node* new_list (int val);
+typedef struct {
+    int length;
+    dl_list_node *head;
+    dl_list_node *tail;
+} linked_list;
 
-dl_list_node* list_from_array (int* array, int length); 
+dl_list_node* create_node (int val); 
 
-void print_list (dl_list_node* list); 
+linked_list* list_from_array (int* array, int length); 
+
+
+void print_list (linked_list * list); 
+
+void print_head (dl_list_node *head); 
+
+
+void prepend(linked_list *list, int val); 
+
+void append (linked_list *list, int val); 
+
+dl_list_node* walk_list (linked_list *list, int index); 
+
+int get (linked_list *list, int index); 
+
+
+void add_first_node (linked_list *list, int value); 
+
+void insert_at (linked_list *list, int index, int value); 
+
+
+void remove_back (linked_list *list); 
+
+void remove_at (linked_list *list, int index); 
+
+void dl_list_driver (); 
+
 #endif
