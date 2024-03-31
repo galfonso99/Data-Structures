@@ -2,7 +2,6 @@
 #define DOUBLY_LINKED_LIST_H
 
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -42,6 +41,7 @@ void add_first_node (linked_list *list, int value);
 
 void insert_at (linked_list *list, int index, int value); 
 
+int remove_value (linked_list *list, int value);
 
 void remove_back (linked_list *list); 
 

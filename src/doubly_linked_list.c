@@ -1,7 +1,8 @@
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <stdio.h>
+// #include <stdlib.h>
+// #include <string.h>
 #include "doubly_linked_list.h"
 
 
@@ -129,9 +130,39 @@ void insert_at (linked_list *list, int index, int value) {
     return; 
 }
 
+int remove_value (linked_list *list, int value) {
+    dl_list_node *node = list->head;
+    if (node->val == value) {
+        list->head = list->head->next;
+        list->head->prev = NULL;
+        free(node);
+        return 0;
+    }
+    if (list->tail->val == value) { 
+        int index = list->length - 1;
+        remove_back(list); 
+        return index;
+    }
+    int i;
+    for (i = 0; i < list->length && node->val != value; i++) {
+        node = node->next;
+    }
+    if (!node) {
+        return -1;
+    }
+    dl_list_node *prev = node->prev;
+    prev->next = node->next;
+    node->next->prev = prev;
+    free(node);
+
+    list->length--;
+    return i;
+}
+
 void remove_back (linked_list *list) {
     if (!list->head) {return;}
     if (list->length == 1) {
+        free(list->head);
         list->head = NULL;
         list->tail = NULL;
         list->length--;
@@ -175,9 +206,10 @@ void dl_list_driver () {
     // prepend(list, 59);
     // append(list, 145);
     // printf("%d\n", get(list, 1));
-    insert_at(list, 2, 157);
+    // insert_at(list, 2, 157);
     // remove_back(list);
     // remove_at(list, 2);
+    printf("%d\n", remove_value(list, 33));
     print_list(list);
 }
 
