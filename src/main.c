@@ -14,4 +14,5 @@ int main (int argc, char **argv) {
     // int length = sizeof(arr) / sizeof(int);
     // linked_list *list = list_from_array(arr, length);
     // List *list = create_list();
+    binary_tree_driver();
 }

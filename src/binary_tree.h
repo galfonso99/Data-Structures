@@ -88,16 +88,25 @@ bool bfs (binary_node *head, int needle) {
     binary_node **arr = NULL;
     arrput(arr, head);
     while (arrlen(arr) > 0) {
-        binary_node *last_node = arr[arrlen(arr) - 1];
-        if (last_node->val == needle) {
+        binary_node *curr_node = arr[0];
+        arrdel(arr, 0);
+        if (curr_node->val == needle) {
             return true;
         }
 
+        if (curr_node->left) {
+            arrput(arr, curr_node->left);
+        }
+        if (curr_node->right) {
+            arrput(arr, curr_node->right);
+        }
     }
+    return false;
 }
 
 void binary_tree_driver () {
-    int arr[5] = {45, 23, 62, 58, 67};
+    /* int arr[5] = {45, 23, 62, 58, 67}; */
+    int arr[7] = {7, 23, 5, 4, 3, 18, 21};
     // int length = sizeof(arr) / sizeof(int);
     // linked_list *list = list_from_array(arr, length);
     // binary_tree_driver();
@@ -117,10 +126,15 @@ void binary_tree_driver () {
     int length = 7;
     /* pre_order_print(tree, length); */
     // int * traversal = pre_order_traversal(tree);
-    int * traversal = post_order_traversal(tree);
-    for ( int i = 0; i < length; i++) {
-        printf("%d\n", traversal[i]); 
+    /* pre_order_print(tree, length); */
+    if (bfs(tree, 21)) {
+        printf("We found it \n");
+    } else {
+        printf("Not found\n");
     }
+    /* for ( int i = 0; i < length; i++) { */
+    /*     printf("%d\n", traversal[i]);  */
+    /* } */
 }
 
 
