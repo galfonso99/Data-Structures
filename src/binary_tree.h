@@ -2,7 +2,6 @@
 #define BINARY_TREE_H
 
 #define STB_DS_IMPLEMENTATION
-#include "doubly_linked_list.h"
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -84,6 +83,19 @@ int * post_order_traversal (binary_node *head) {
     int * path = post_order_walk(head, &arr);
     return path;
 }
+
+bool bfs (binary_node *head, int needle) {
+    binary_node **arr = NULL;
+    arrput(arr, head);
+    while (arrlen(arr) > 0) {
+        binary_node *last_node = arr[arrlen(arr) - 1];
+        if (last_node->val == needle) {
+            return true;
+        }
+
+    }
+}
+
 void binary_tree_driver () {
     int arr[5] = {45, 23, 62, 58, 67};
     // int length = sizeof(arr) / sizeof(int);
