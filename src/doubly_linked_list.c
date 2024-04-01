@@ -206,10 +206,10 @@ void dl_list_driver () {
     // prepend(list, 59);
     // append(list, 145);
     // printf("%d\n", get(list, 1));
-    // insert_at(list, 2, 157);
     // remove_back(list);
     // remove_at(list, 2);
-    printf("%d\n", remove_value(list, 33));
+    printf("%d\n", remove_value(list, 58));
+    insert_at(list, 2, 157);
     print_list(list);
 }
 
