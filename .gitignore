@@ -26,3 +26,4 @@ build-xcode-debug
 *.xcbkptlist
 
 *.orig
+main

@@ -128,7 +128,7 @@ binary_node * get_biggest_child (binary_node ** node, binary_node *parent) {
         biggest_node = walk;
         // *node = actual_root;
     }
-    parent->left = walk->left;
+    // parent->left = walk->left;
     biggest_node->parent = parent;
     return biggest_node;
 }
@@ -149,7 +149,7 @@ binary_node * get_smallest_child (binary_node ** node, binary_node *parent) {
         smallest_node = walk;
         // *node = actual_root;
     }
-    parent->right = walk->right;
+    // parent->right = walk->right;
     smallest_node->parent = parent;
     return smallest_node;
     
@@ -168,21 +168,43 @@ bool delete (binary_node * head, int value) {
         *node_ptr = NULL;
         return true;
     }
+    // if (!node->left || !node->right) {
+    //     swap_with_child(node);
+    //     return true;
+    // }
     // Node has both left and right
-    int left_h = get_height(node->left);
-    int right_h = get_height(node->right);
+    int left_h = get_height(node->left) + 1;
+    int right_h = get_height(node->right) + 1;
     if (left_h >= right_h) {
         printf("Went left\n");
-        binary_node * found_node = get_biggest_child(&node->left, node);
-        node->val = found_node->val;
-        found_node->parent->left = found_node->left;
-        found_node->parent->right = NULL;
+        binary_node * found_child = get_biggest_child(&node->left, node);
+        if (node == found_child->parent) {
+            printf("One deep\n");
+            binary_node * node_right = node->right;
+            *node_ptr = found_child;
+            (*node_ptr)->right = node_right;
+        } else {
+            printf("More than One deep\n");
+            node->val = found_child->val;
+            found_child->parent->right = found_child->left;
+        }
     } else {
         printf("Went right\n");
-        binary_node * found_node = get_smallest_child(&node->right, node);
-        node->val = found_node->val;
-        found_node->parent->right = found_node->right;
-        found_node->parent->left = NULL;
+        binary_node * found_child = get_smallest_child(&node->right, node);
+        printf("%d, %d\n", left_h, right_h);
+        if (node == found_child->parent) {
+            printf("One deep\n");
+            binary_node * node_left = node->left;
+            *node_ptr = found_child;
+            (*node_ptr)->left = node_left;
+        } else if (node->right == found_child->parent && found_child->parent->val == found_child->val) {
+            binary_node * node_left = node->left;
+            *node_ptr = found_child->parent;
+        } else {
+            printf("More than One deep\n");
+            node->val = found_child->val;
+            found_child->parent->left = found_child->right;
+        }
     }
     return true;
 }
@@ -212,9 +234,11 @@ int main (int argc, char **argv) {
     binary_tree_print(tree1);
     insert(tree1, 27);
     insert(tree1, 6);
+    
     // insert(tree1, 9);
     insert(tree1, 8);
-    // insert(tree1, 7);
+    insert(tree1, 6);
+    insert(tree1, 9);
     // insert(tree1, 10);
     // binary_tree_print(tree1);
     // printf("With zig\n");
