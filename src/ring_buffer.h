@@ -26,7 +26,6 @@ void push (RingBuffer *ring_buffer, int val);
 
 int pop (RingBuffer *ring_buffer); 
 
-
 void enqueue (RingBuffer *ring_buffer, int val); 
 
 int deque (RingBuffer *ring_buffer); 
