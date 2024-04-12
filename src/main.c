@@ -34,18 +34,24 @@ void print_heap (min_heap * heap) {
             h++;
         }
     }
+    printf("\n");
+
 }
 
 int parent(int child_idx) {
     return (child_idx - 1) / 2;
 }
 
-int left_child(int parent_idx) {
+int left_child (int parent_idx) {
     return (parent_idx * 2) + 1;
 }
 
 int right_child(int parent_idx) {
     return (parent_idx * 2) + 2;
+}
+
+int min (int a, int b) {
+    return a <= b ? a : b;
 }
 
 void swap (min_heap * heap, int child_idx, int parent_idx) {
@@ -55,8 +61,9 @@ void swap (min_heap * heap, int child_idx, int parent_idx) {
     arr[parent_idx] = tmp;
 }
 
-bool heapify_up (min_heap * heap, int value, int idx) {
+bool heapify_up (min_heap * heap, int idx) {
     int * arr = heap->data;
+    int value = arr[idx];
     int parent_idx = parent(idx);
     while (parent_idx >= 0 && arr[parent_idx] > value) {
         swap(heap, idx, parent_idx);
@@ -66,42 +73,60 @@ bool heapify_up (min_heap * heap, int value, int idx) {
     return true;
 }
 
+bool heapify_down (min_heap * heap, int idx) {
+    int * arr = heap->data;
+    int l_idx = left_child(idx);
+    int r_idx = right_child(idx);
+    while (r_idx < heap->length && (arr[l_idx] < arr[idx] || arr[r_idx] < arr[idx])) {
+        int min_idx = l_idx;
+        if (arr[r_idx] < arr[l_idx]) {
+            min_idx = r_idx;
+        }
+        swap(heap, idx, min_idx);
+        idx = min_idx;
+        l_idx = left_child(min_idx);
+        r_idx = right_child(min_idx);
+    }
+    if (l_idx < heap->length && arr[l_idx] < arr[idx]) {
+        swap(heap, idx, l_idx);
+    }
+    return true;
+}
+
 bool insert(min_heap * heap, int value) {
     // Insert the value into the end of the queue
     // Heapify up from that spot until parent is smaller or there is no more parents
-    // int * arr = heap->data;
     arrput(heap->data, value);
-    // for (int i = 0; i < 8; i++) {
-    //     printf("%d\n", arr[i]);
-    // }
     heap->length++;
-    bool success = heapify_up(heap, value, heap->length - 1);
+    bool success = heapify_up(heap, heap->length - 1);
     return success;
 }
 
 int pop(min_heap * heap) {
-    return -1;
+    if (heap->length == 0) return -1;
+    // Swap first value with last value
+    swap(heap, heap->length-1, 0);
+    int value = arrpop(heap->data);
+    heap->length--;
+    heapify_down(heap, 0);
+    return value;
 }
+// Finished with min-heap / priority queue
+// Now just put it away in a header file
 // Maybe implement updating using a hashmap and bubble up or bubble down
 int main (int argc, char **argv) {
-    int arr[7] = {12, 34, 54, 45, 51, 61, 77};
+    int arr[13] = {12, 54, 15, 61, 77, 33, 34, 78, 80, 91, 100, 55, 77};
     int length = sizeof(arr) / sizeof(int);
     min_heap * heap = min_heap_from_arr((int *) &arr, length);
-    
-    insert(heap, 33);
-    // for (int i = 0; i < heap->length; i++) {
-    //     printf("%d\n", heap->data[i]);
-    // }
-    insert(heap, 49);
-    insert(heap, 15);
     print_heap(heap);
-    // for (int i = 0; i < heap->length; i++) {
-    //     printf("%d\n", heap->data[i]);
-    // }
+    printf("\n");
+    printf("%d\n", pop(heap));
+    print_heap(heap);
+    
+
     // for (int i = 0; i < length; i++) {
     //     printf("%d\n", arr[i]);
     // }
-    // binary_tree_driver();
 }
 
 
