@@ -17,6 +17,13 @@ typedef struct {
     int ** matrix;
 } graph_matrix;
 
+typedef struct {
+    int to;
+    int weight;
+} graph_edge;
+
+typedef graph_edge** adjacency_list;
+
 void create_matrix (graph_matrix * matrix) {
     matrix->vertices_nr = 5;
     matrix->matrix = malloc(sizeof(int) * matrix->vertices_nr * matrix->vertices_nr);
@@ -33,6 +40,30 @@ void create_matrix (graph_matrix * matrix) {
     }
     // matrix->matrix[0][0] = 5;
     // matrix->matrix[0][1] = 7;
+}
+
+adjacency_list create_adjacency_list () {
+    int nr_of_vertices = 5;
+    adjacency_list adj_list = malloc(sizeof(int) * nr_of_vertices * nr_of_vertices);
+    int edges_nr[] = {3,1,1,1,0};
+    graph_edge list_of_edges[] = {
+                                {.to =  1, .weight = 1},
+                                {.to =  2, .weight = 4},
+                                {.to =  3, .weight = 5},
+                                {.to =  0, .weight = 1},
+                                {.to =  3, .weight = 2},
+                                {.to =  4, .weight = 5},
+                                };
+    int count = 0;
+    for (int i = 0; i < nr_of_vertices; i++) {
+        adj_list[i] = malloc(sizeof(int) * nr_of_vertices);
+        int length = edges_nr[i];
+        for (int j = 0; j < length; j++) {
+            adj_list[i][j] = list_of_edges[count];
+            count++;
+        }
+    }
+    return adj_list;
 }
 
 void print_matrix (graph_matrix * matrix) {
@@ -100,19 +131,18 @@ int * bst_find_graph (graph_matrix * matrix, int source, int needle) {
 
 }
 
-// Create a matrix to represent a graph
-// Figure out a way to perform bfs on such a graph using adj matrix
+bool dfs_walk (adjacency_list graph, int curr, int needle, bool * seen, int * path) {
+
+}
+
+int * find_dfs_adjacency_list (adjacency_list graph, int source, int needle) {
+
+}
+
 int main (int argc, char **argv) {
-    // int arr[13] = {12, 54, 15, 61, 77, 33, 34, 78, 80, 91, 100, 55, 77};
-    // int arr[7] = {7, 4, 12, 2, 5, 9, 15};
     // int length = sizeof(arr) / sizeof(int);
-    graph_matrix * matrix = malloc(sizeof(graph_matrix));
-    create_matrix(matrix);
-    // print_matrix(matrix);
-    int * path = bst_find_graph(matrix, 2, 4);
-    // if (!path) {
-    //     printf("Fuck\n");
-    // }
+    adjacency_list graph = create_adjacency_list();
+    int * path = find_dfs_adjacency_list(graph, 2, 4);
     for (int i = 0; i < arrlen(path); i++) {
         printf("%d, ", path[i]);
     }
