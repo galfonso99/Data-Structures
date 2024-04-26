@@ -131,18 +131,48 @@ int * bst_find_graph (graph_matrix * matrix, int source, int needle) {
 
 }
 
-bool dfs_walk (adjacency_list graph, int curr, int needle, bool * seen, int * path) {
+bool dfs_walk (adjacency_list graph, int curr, int needle, bool * seen, int ** path) {
+    if (curr == needle) {
+        arrput(*path, curr);
+        return true;
+    }
+    if (seen[curr]) {
+        return false;
+    }
+    //pre
+    seen[curr] = true;
+    arrput(*path, curr);
 
+    //recurse
+    int i = 0;
+    // While weight is defined it means the graph_edge isnt NULL
+    while (graph[curr][i].weight) {
+        if (
+            dfs_walk(graph, graph[curr][i].to, needle, seen, path)
+        ) {
+            return true;
+        }
+        i++;
+    }
+    // Post
+    arrpop(*path);
+    return false;
 }
 
 int * find_dfs_adjacency_list (adjacency_list graph, int source, int needle) {
-
+    bool seen[] = {false, false, false, false, false};
+    int * path = NULL;
+    dfs_walk(graph, source, needle, (bool *) seen, &path);
+    return path;
 }
 
 int main (int argc, char **argv) {
     // int length = sizeof(arr) / sizeof(int);
     adjacency_list graph = create_adjacency_list();
-    int * path = find_dfs_adjacency_list(graph, 2, 4);
+    int * path = find_dfs_adjacency_list(graph, 1, 3);
+    if (graph[0][3].weight) {
+        printf("It exists\n");
+    }
     for (int i = 0; i < arrlen(path); i++) {
         printf("%d, ", path[i]);
     }
