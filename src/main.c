@@ -1,62 +1,52 @@
+#include "graph.h"
 #define STB_DS_IMPLEMENTATION
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "stb_ds.h"
 // #include "binary_search_tree.h"
 
-typedef struct node {
-    int value;
+#define int_max 2147483647
 
-} graph_node;
-
-typedef struct {
-    int vertices_nr;
-    int ** matrix;
-} graph_matrix;
-
-typedef struct {
-    int to;
-    int weight;
-} graph_edge;
-
-typedef graph_edge** adjacency_list;
-
-void create_matrix (graph_matrix * matrix) {
-    matrix->vertices_nr = 5;
-    matrix->matrix = malloc(sizeof(int) * matrix->vertices_nr * matrix->vertices_nr);
-    int array[25] = {0,1,4,5,0,1,0,0,0,0,0,0,0,2,0,0,0,0,0,5,0,0,0,0,0};
-    // memcpy(matrix->matrix, array, sizeof(int) * 2);
-    // printf("%p\n", **matrix->matrix);
-    for (int i = 0; i < matrix->vertices_nr; i++) {
-        matrix->matrix[i] = malloc(sizeof(int) * matrix->vertices_nr);
-        for (int j = 0; j < matrix->vertices_nr; j++) {
-            matrix->matrix[i][j] = array[matrix->vertices_nr * i+j];
-            // printf("%d\n", array[matrix->vertices_nr * i+j]);
-            // printf("At %d, and at %d, %d\n", i, j, matrix->matrix[i][j]);
-        }
+void fill_with_bool (bool * arr, bool boolean, int count) {
+    for (int i = 0; i < count; i++) {
+        arr[i] = boolean;
     }
-    // matrix->matrix[0][0] = 5;
-    // matrix->matrix[0][1] = 7;
+}
+void initialize_with_infinity (int * arr, int count) {
+    for (int i = 0; i < count; i++) {
+        arr[i] = int_max;
+    }
 }
 
-adjacency_list create_adjacency_list () {
-    int nr_of_vertices = 5;
-    adjacency_list adj_list = malloc(sizeof(int) * nr_of_vertices * nr_of_vertices);
-    int edges_nr[] = {3,1,1,1,0};
+adjacency_list create_adjacency_list2 (int length) {
+    adjacency_list adj_list = (graph_edge **) malloc(sizeof(int) * length * length);
+    int edges_nr[] = {2,3,3,3,3,3,2};
     graph_edge list_of_edges[] = {
-                                {.to =  1, .weight = 1},
+                                {.to =  1, .weight = 3},
+                                {.to =  2, .weight = 1},
+                                {.to =  0, .weight = 3},
                                 {.to =  2, .weight = 4},
-                                {.to =  3, .weight = 5},
+                                {.to =  4, .weight = 1},
+                                {.to =  1, .weight = 4},
+                                {.to =  3, .weight = 7},
                                 {.to =  0, .weight = 1},
-                                {.to =  3, .weight = 2},
+                                {.to =  2, .weight = 7},
                                 {.to =  4, .weight = 5},
+                                {.to =  6, .weight = 1},
+                                {.to =  1, .weight = 1},
+                                {.to =  3, .weight = 5},
+                                {.to =  5, .weight = 2},
+                                {.to =  6, .weight = 1},
+                                {.to =  4, .weight = 2},
+                                {.to =  2, .weight = 18},
+                                {.to =  3, .weight = 1},
+                                {.to =  5, .weight = 1},
                                 };
     int count = 0;
-    for (int i = 0; i < nr_of_vertices; i++) {
-        adj_list[i] = malloc(sizeof(int) * nr_of_vertices);
+    for (int i = 0; i < length; i++) {
+        adj_list[i] = (graph_edge *) malloc(sizeof(int) * length);
         int length = edges_nr[i];
         for (int j = 0; j < length; j++) {
             adj_list[i][j] = list_of_edges[count];
@@ -66,115 +56,79 @@ adjacency_list create_adjacency_list () {
     return adj_list;
 }
 
-void print_matrix (graph_matrix * matrix) {
-    for (int i = 0;i < matrix->vertices_nr;i++) {   
-        for (int j = 0; j < matrix->vertices_nr; j++) {
-            printf("%d\n", matrix->matrix[i][j]);
+void initialize_2d_array (int ** arr, int y, int x, int val) {
+    for (int i = 0; i < y; i++) {
+        arr[i] = malloc(sizeof(int) * 5);
+        for (int j = 0; j < x; j ++) {
+            arr[i][j] = val;
         }
-        printf("\n");
     }
 }
 
-void fill_prev (int * prev, int length) {
+void initialize_paths (int ** arr, int length, int val) {
     for (int i = 0; i < length; i++) {
-        prev[i] = -1;
+        arrput(arr[i], val);
     }
 }
 
-void reverse (int * path, int length) {
-    for (int i = 0; i < length / 2; i++) {
-        int tmp = path[i];
-        path[i] = path[length - 1 - i];
-        path[length - 1 - i] = tmp;
-    }
-}
-
-int * bst_find_graph (graph_matrix * matrix, int source, int needle) {
+// For this algorithm which I naively created for shortest path I simply visit each node and for every node
+// I visit all the adjacent nodes, then if the distance of curr path that arrived at the specific adjacent node
+// is shorter than the previous shortest distance mark it as the new shortest distance and make the current path be 
+// the new shortest path of that adjacent node
+int * dijkstra_no_help (int source, int sink, adjacency_list graph, int vertex_count ) {
+    bool processed_nodes[vertex_count];
+    fill_with_bool(processed_nodes, false, vertex_count);
+    int * distances = malloc(sizeof(int) * vertex_count);
+    initialize_with_infinity(distances, vertex_count);
+    int ** paths = malloc(sizeof(int) * vertex_count * 5);
+    initialize_paths(paths,vertex_count, source);
     int * queue = NULL;
-    int * path = NULL; 
-
-    if (source == needle) {
-        arrput(path, source);
-        return path;
-    }
-
-    bool * seen = malloc(sizeof(bool) * matrix->vertices_nr);
-    int prev_length = matrix->vertices_nr <= needle ? needle + 1 : matrix->vertices_nr;
-    int * prev = malloc(sizeof(int) * prev_length);
-    fill_prev(prev, prev_length);
-    int idx = source;
-
-    arrput(queue, source);
-
-    while (arrlen(queue) != 0) {
-        idx = queue[0];
-        arrdel(queue, 0);
-        if (idx == needle) break;
-        seen[idx] = true;
-        for (int i = 0; i < matrix->vertices_nr; i++) {
-            int weight = matrix->matrix[idx][i];
-            if (weight > 0 && !seen[i]) {
-                arrput(queue, i);
-                prev[i] = idx;
+    int curr_node = source;
+    distances[curr_node] = 0;
+    while (curr_node != sink) {
+        for (int i = 0; i < vertex_count; i++) {
+            if (graph[curr_node][i].weight == 0) {
+                break;
+            }
+            int curr_path_dist = distances[curr_node];
+            int adjacent_node = graph[curr_node][i].to;
+            int adjacent_dist = graph[curr_node][i].weight;
+            if (curr_path_dist + adjacent_dist < distances[adjacent_node]) {
+                distances[adjacent_node] = curr_path_dist + adjacent_dist;
+                // Copy the path of curr into the path of adjacent then delete any overflowing leftover,
+                // then append the adjacent_node into the array
+                memcpy(paths[adjacent_node], paths[curr_node], sizeof(int) * arrlen(paths[curr_node]));
+                arrdeln(paths[adjacent_node], arrlen(paths[curr_node]), arrlen(paths[adjacent_node]) - 
+                                                                                arrlen(paths[curr_node]));
+                arrput(paths[adjacent_node], adjacent_node);
+                if (!processed_nodes[adjacent_node]) {
+                    arrput(queue, adjacent_node);
+                }
             }
         }
+        processed_nodes[curr_node] = true;
+        curr_node = queue[0];
+        arrdel(queue, 0);
     }
-    idx = needle;
-    while (prev[idx] != -1) {
-        arrput(path, idx);
-        idx = prev[idx];
-    }
-    if (arrlen(path) == 0) return NULL;
-    arrput(path, idx);
-    reverse(path, arrlen(path));
-    return path;
-
+    return paths[sink];
 }
 
-bool dfs_walk (adjacency_list graph, int curr, int needle, bool * seen, int ** path) {
-    if (curr == needle) {
-        arrput(*path, curr);
-        return true;
-    }
-    if (seen[curr]) {
-        return false;
-    }
-    //pre
-    seen[curr] = true;
-    arrput(*path, curr);
+// This algorithm was made after the "no help" algorithm and uses external pseudocode as help
+// Just watch the pseudocode from Prime and code a version that upholds that standard
+int * dijkstra_with_pseudocode (int source, int sink, adjacency_list graph, int vertex_count) {
 
-    //recurse
-    int i = 0;
-    // While weight is defined it means the graph_edge isnt NULL
-    while (graph[curr][i].weight) {
-        if (
-            dfs_walk(graph, graph[curr][i].to, needle, seen, path)
-        ) {
-            return true;
-        }
-        i++;
-    }
-    // Post
-    arrpop(*path);
-    return false;
-}
-
-int * find_dfs_adjacency_list (adjacency_list graph, int source, int needle) {
-    bool seen[] = {false, false, false, false, false};
-    int * path = NULL;
-    dfs_walk(graph, source, needle, (bool *) seen, &path);
-    return path;
 }
 
 int main (int argc, char **argv) {
     // int length = sizeof(arr) / sizeof(int);
-    adjacency_list graph = create_adjacency_list();
-    int * path = find_dfs_adjacency_list(graph, 1, 3);
-    if (graph[0][3].weight) {
-        printf("It exists\n");
-    }
+    int graph_node_count = 5;
+    adjacency_list graph = create_adjacency_list(graph_node_count);
+    int graph2_node_count = 7;
+    adjacency_list graph2 = create_adjacency_list2(graph2_node_count);
+    int * path = dijkstra_no_help(0, 4, graph, graph_node_count);
+    // printf("%d\n", paths[2]);
     for (int i = 0; i < arrlen(path); i++) {
-        printf("%d, ", path[i]);
+        printf("%d\n", path[i]);
     }
 }
 
