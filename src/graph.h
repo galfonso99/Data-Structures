@@ -41,7 +41,7 @@ void create_matrix (graph_matrix * matrix) {
 }
 
 adjacency_list create_adjacency_list (int length) {
-    adjacency_list adj_list = (graph_edge **) malloc(sizeof(int) * length * length);
+    adjacency_list adj_list = (graph_edge **) malloc(sizeof(graph_edge) * length * length);
     int edges_nr[] = {3,1,1,1,0};
     graph_edge list_of_edges[] = {
                                 {.to =  1, .weight = 1},
@@ -53,10 +53,12 @@ adjacency_list create_adjacency_list (int length) {
                                 };
     int count = 0;
     for (int i = 0; i < length; i++) {
-        adj_list[i] = (graph_edge *) malloc(sizeof(int) * length);
+        adj_list[i] = (graph_edge *) malloc(sizeof(graph_edge) * length);
         int length = edges_nr[i];
+        adj_list[i] = NULL;
         for (int j = 0; j < length; j++) {
-            adj_list[i][j] = list_of_edges[count];
+            /* adj_list[i][j] = list_of_edges[count]; */
+            arrput(adj_list[i], list_of_edges[count]);
             count++;
         }
     }
@@ -86,7 +88,7 @@ void reverse (int * path, int length) {
     }
 }
 
-int * bst_find_graph (graph_matrix * matrix, int source, int needle) {
+int * bfs_find_graph (graph_matrix * matrix, int source, int needle) {
     int * queue = NULL;
     int * path = NULL; 
 

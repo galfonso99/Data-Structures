@@ -48,8 +48,9 @@ adjacency_list create_adjacency_list2 (int length) {
     for (int i = 0; i < length; i++) {
         adj_list[i] = (graph_edge *) malloc(sizeof(int) * length);
         int length = edges_nr[i];
+        adj_list[i] = NULL;
         for (int j = 0; j < length; j++) {
-            adj_list[i][j] = list_of_edges[count];
+            arrput(adj_list[i], list_of_edges[count]);
             count++;
         }
     }
@@ -112,10 +113,81 @@ int * dijkstra_no_help (int source, int sink, adjacency_list graph, int vertex_c
     }
     return paths[sink];
 }
+void fill_with_int(int * arr, int val, int count) {
+    for (int i = 0; i < count; i++) {
+        arr[i] = val;
+    }
+}
 
-// This algorithm was made after the "no help" algorithm and uses external pseudocode as help
-// Just watch the pseudocode from Prime and code a version that upholds that standard
+bool has_unvisited (bool * seen, int length) {
+    for (int i = 0; i < length; i++) {
+        if (!seen[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+int get_lowest_unvisited (int * dists, bool * seen, int length) {
+    int lowest_node = 0;
+    int lowest_dist = int_max;
+    for (int i = 0; i < length; i++) {
+        if (!seen[i] && dists[i] < lowest_dist) {
+            lowest_dist = dists[i];
+            lowest_node = i;
+        }
+    }
+    return lowest_node;
+}
+
+// This algorithm was made after the "no help" algorithm and uses external pseudocode from Primeagen as help
 int * dijkstra_with_pseudocode (int source, int sink, adjacency_list graph, int vertex_count) {
+    int prev[vertex_count];
+    fill_with_int(prev, -1, vertex_count);
+    bool seen[vertex_count];
+    fill_with_bool (seen, false, vertex_count);
+    int dists[vertex_count];
+    fill_with_int(dists, int_max, vertex_count);
+    dists[source] = 0;
+
+    while (has_unvisited(seen, vertex_count)) {
+        int low = get_lowest_unvisited(dists, seen, vertex_count);
+        seen[low] = true;
+        for (int i = 0; i < arrlen(graph[low]); i++) {
+            int edge = graph[low][i].to;
+            int weight = graph[low][i].weight;
+            if (seen[edge]) {
+                continue;
+            }
+            int dist = dists[low] + weight;
+            if (dist < dists[edge]) {
+                dists[edge] = dist;
+                prev[edge] = low;
+            }
+        }
+    }
+    int * path = NULL;
+    int curr = sink;
+    while (prev[curr] != -1) {
+        arrput(path, curr);
+        curr = prev[curr];
+    }
+    if (arrlen(path) == 0) return NULL;
+    arrput(path, curr);
+    reverse(path, arrlen(path));
+    return path;
+}
+
+// Implement dijkstras using a priority queue and implement heap up down and heap update which uses 
+// a hashmap to keep the position of the nodes
+//
+// Implement a priority queue that takes graph edge as elements
+// Implement heapify up for such prio queue
+// Implement heapify down for such prio queue
+// Implement heap update for such prio queue
+// Implement the hashmap that will go alongside it 
+// Write dijk using this prio queue
+int * dijkstra (int source, int sink, adjacency_list graph, int vertex_count) {
 
 }
 
@@ -125,7 +197,9 @@ int main (int argc, char **argv) {
     adjacency_list graph = create_adjacency_list(graph_node_count);
     int graph2_node_count = 7;
     adjacency_list graph2 = create_adjacency_list2(graph2_node_count);
-    int * path = dijkstra_no_help(0, 4, graph, graph_node_count);
+    // int * path = dijkstra_no_help(0, 4, graph, graph_node_count);
+    // int * path = dijkstra_with_pseudocode(0, 4, graph, graph_node_count);
+    int * path = dijkstra_with_pseudocode(0, 6, graph2, graph2_node_count);
     // printf("%d\n", paths[2]);
     for (int i = 0; i < arrlen(path); i++) {
         printf("%d\n", path[i]);
