@@ -121,7 +121,9 @@ void min_heap_driver () {
     printf("\n");
     /* int value = pop(heap); */
     printf("%d\n", pop(heap));
+    printf("\n");
     print_heap(heap);
+    printf("\n");
     printf("%d\n", pop(heap));
     print_heap(heap);
     printf("%d\n", pop(heap));
