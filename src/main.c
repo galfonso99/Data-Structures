@@ -1,10 +1,13 @@
-#include "graph.h"
+#include <stdint.h>
 #define STB_DS_IMPLEMENTATION
+#include "graph.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
+// #include <math.h>
+// #include "hash_map.h"
+#include "map.h"
 // #include "binary_search_tree.h"
 
 #define int_max 2147483647
@@ -60,7 +63,6 @@ adjacency_list create_adjacency_list2 (int length) {
 
 adjacency_list create_adjacency_list3 (int length) {
     adjacency_list adj_list = (graph_edge **) malloc(sizeof(graph_edge) * length * length);
-    for (int i = 0; i < length; i++) {
     int edges_nr[] = {2,1,2,1,0};
     graph_edge list_of_edges[] = {
                                 {.to =  1, .weight = 7},
@@ -82,7 +84,6 @@ adjacency_list create_adjacency_list3 (int length) {
         }
     }
     return adj_list;
-}
 }
 
 void initialize_2d_array (int ** arr, int y, int x, int val) {
@@ -221,13 +222,34 @@ int right_child(int parent_idx) {
 typedef struct {
     int length;
     graph_edge ** data;
+    hashmap * map;
 } priority_queue;
 
 priority_queue * create_priority_queue (int vertex_count) {
     priority_queue * pq = malloc(sizeof(priority_queue));
     pq->length = 0;
     pq->data = NULL;
+    pq->map = hashmap_create();
     return pq;
+}
+
+int hm_get(hashmap * map, void * key) {
+    uintptr_t out;
+    hashmap_get(map, key, sizeof(int), &out);
+    return (int) out;
+}
+
+void hm_set(hashmap * map, void * key, int value) {
+    hashmap_set(map, key, sizeof(int), value);
+}
+
+void print_hashmap (priority_queue * pq) {
+    for (int i = 0; i < pq->length; i++) {
+        printf("HashMap Label %d: Index %d\n", pq->data[i]->to, hm_get(pq->map, &pq->data[i]->to));
+    }
+}
+void print_entry(void* key, size_t ksize, uintptr_t value, void* usr) {
+	printf("Entry \"%d\": %i\n", *(int *) key, (int) value);
 }
 
 void swap (priority_queue * pq, int child_idx, int parent_idx) {
@@ -236,7 +258,11 @@ void swap (priority_queue * pq, int child_idx, int parent_idx) {
     graph_edge * edge_2 = arr[parent_idx];
     arr[child_idx] = edge_2;
     arr[parent_idx] = edge_1;
+    hm_set(pq->map, &edge_1->to, parent_idx);
+    hm_set(pq->map, &edge_2->to, child_idx);
+    print_hashmap(pq);
 }
+
 bool heapify_up (priority_queue * pq, int idx) {
     graph_edge ** arr = pq->data;
     graph_edge * edge = arr[idx];
@@ -274,6 +300,11 @@ bool enqueue(priority_queue * pq, graph_edge * edge) {
     // Heapify up from that spot until parent is smaller or there is no more parents
     arrput(pq->data, edge);
     pq->length++;
+    // printf("Setting label %d to idx %d\n", edge->to, pq->length - 1);
+    hm_set(pq->map, &edge->to, pq->length - 1);
+    // printf("Printing from enqueue\n");
+    print_hashmap(pq);
+    // printf("End Printing from enqueue\n");
     bool success = heapify_up(pq, pq->length - 1);
     return success;
 }
@@ -288,19 +319,23 @@ graph_edge * deque(priority_queue * pq) {
     return edge;
 }
 
-bool update_queue (priority_queue * pq, graph_edge * edge, int idx) {
-    // get real index thru the hashmap
+bool update_queue (priority_queue * pq, graph_edge * edge) {
+    hashmap * map = pq->map;
+    // hashmap_get(map, &idx, sizeof(int), &out);
+    int real_idx = hm_get(pq->map, &edge->to);
+    printf("In update, for laber %d, we get value %d\n", edge->to, hm_get(pq->map, &edge->to));
+    printf("Given the label %d Here is the real idx %d\n", edge->to, real_idx);
     // printf("Given %d The real idx is %d\n", idx, real_idx);
-    // pq->data[real_idx] = edge;
-    // int parent_idx = parent(real_idx);
-    // bool success;
-    // if (edge->weight < pq->data[parent_idx]->weight) {
-    //     success = heapify_up(pq, real_idx);
-    // } else {
-    //     success = heapify_down(pq, real_idx);
-    // }
-    // return success;
-
+    printf("Updating index %d\n", real_idx);
+    pq->data[real_idx] = edge;
+    int parent_idx = parent(real_idx);
+    bool success;
+    if (edge->weight < pq->data[parent_idx]->weight) {
+        success = heapify_up(pq, real_idx);
+    } else {
+        success = heapify_down(pq, real_idx);
+    }
+    return success;
 }
 
 // Implement dijkstras using a priority queue and implement heap up down and heap update which uses 
@@ -348,25 +383,79 @@ int * dijkstra (int source, int sink, adjacency_list graph, int vertex_count) {
     return path;
 }
 
-// IN PROGRESS Implement the hashmap that will go alongside it 
+// void print_hm (hashmap * map) {
+//     for (int i = 0; i < 7; i++) {
+//         printf("%d: %d\n", i, hm_get(map, i));
+//     }
+// }
+
+// 4. Implement and test the update_queue funtion using the hashmap
+// This is kinda working only thing left is updating the hashmap each time you do a swap enqueue or deque
+// Then test it
 int main (int argc, char **argv) {
     // int length = sizeof(arr) / sizeof(int);
-    int graph_node_count = 5;
-    adjacency_list graph = create_adjacency_list(graph_node_count);
-    int graph2_node_count = 7;
-    adjacency_list graph2 = create_adjacency_list2(graph2_node_count);
-    adjacency_list graph3 = create_adjacency_list3(graph_node_count);
+    // int graph_node_count = 5;
+    // adjacency_list graph = create_adjacency_list(graph_node_count);
+    // int graph2_node_count = 7;
+    // adjacency_list graph2 = create_adjacency_list2(graph2_node_count);
+    // adjacency_list graph3 = create_adjacency_list3(graph_node_count);
+    //
     // int * path = dijkstra_no_help(0, 4, graph, graph_node_count);
     // int * path = dijkstra(0, 6, graph2, graph2_node_count);
     // int * path = dijkstra_with_pseudocode(0, 6, graph2, graph2_node_count);
-    int * path = dijkstra(0, 6, graph2, graph2_node_count);
     // int * path = dijkstra(0, 4, graph3, graph_node_count);
-    // printf("%d\n", paths[2]);
-    if (!path) {
-        printf("Path is NULL\n");
+    // int * path = dijkstra(0, 6, graph2, graph2_node_count);
+    //
+    // if (!path) {
+    //     printf("Path is NULL\n");
+    // }
+    // for (int i = 0; i < arrlen(path); i++) {
+    //     printf("%d\n", path[i]);
+    // }
+    priority_queue * pq = create_priority_queue(5);
+    graph_edge edge = {.to = 0, .weight = 6};
+    enqueue(pq, &edge);
+    // int idx = 0;
+    // hashmap_set(pq->map, &idx, sizeof(int), 2);
+    graph_edge edge2 = {.to = 1, .weight = 7};
+    enqueue(pq, &edge2);
+    // int idx2 = 1;
+    // hashmap_set(pq->map, &idx2, sizeof(int), 1);
+    graph_edge edge3 = {.to = 2, .weight = 4};
+    enqueue(pq, &edge3);
+    // int idx3 = 2;
+    // hashmap_set(pq->map, &idx3, sizeof(int), 0);
+    graph_edge edge4 = {.to = 3, .weight = 9};
+    enqueue(pq, &edge4);
+    // print_hashmap(pq);
+    // int idx4 = 3;
+    // hashmap_set(pq->map, &idx4, sizeof(int), 3);
+    // printf("%d\n", pq->data[2]->to);
+    for (int i = 0; i < pq->length; i++) {
+        printf("Edge label / weight pair %d: %d\n", pq->data[i]->to, pq->data[i]->weight);
     }
-    for (int i = 0; i < arrlen(path); i++) {
-        printf("%d\n", path[i]);
+    // for (int i = 0; i < pq->length; i++) {
+    //     printf("%d: %d\n", i, hm_get(pq->map, i));
+    // }
+    graph_edge new_edge = {.to = 3, .weight = 5};
+    // update_queue(pq, &new_edge);
+    update_queue(pq, &new_edge);
+    // print_hashmap(pq);
+    // printf("%d\n", pq->data[2]->to);
+    for (int i = 0; i < pq->length; i++) {
+        printf("Edge label / weight pair %d: %d\n", pq->data[i]->to, pq->data[i]->weight);
     }
-}
+    // for (int i = 0; i < pq->length; i++) {
+    //     printf("%d: %d\n", i, hm_get(pq->map, i));
+    // }
+    hashmap_iterate(pq->map, print_entry, NULL);
 
+    hashmap * test_map = hashmap_create();
+    // hm_set(test_map, 3, 9);
+    // hm_set(test_map, 2, 4);
+    // hm_set(test_map, 6, 36);
+
+    // int value = hm_get(test_map, 6);
+    // printf("This is the value %d\n", value);
+    // print_hm(test_map);
+}
