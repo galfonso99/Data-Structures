@@ -6,8 +6,8 @@
 #include "doubly_linked_list.h"
 
 
-dl_list_node* create_node (int val) {
-  dl_list_node* list = malloc(sizeof(dl_list_node));
+node* create_node (int val) {
+  node* list = malloc(sizeof(node));
   list->val = val;
   list->next = NULL;
   list->prev = NULL;
@@ -19,9 +19,9 @@ linked_list* list_from_array (int* array, int length) {
   linked_list* list = malloc(sizeof(linked_list));
     list->length = length;
   list->head = create_node(array[0]);
-    dl_list_node *true_head = list->head;
+    node *true_head = list->head;
   for (int i = 1; i < length; i++) {
-    dl_list_node* next_node = create_node(array[i]);
+    node* next_node = create_node(array[i]);
     list->head->next = next_node;
     list->head->next->prev = list->head;
     list->head = list->head->next;
@@ -32,7 +32,7 @@ linked_list* list_from_array (int* array, int length) {
 }
 
 void print_list (linked_list * list) {
-    dl_list_node *true_head = list->head;
+    node *true_head = list->head;
   while (list->head != NULL) {
     printf("%d\n", list->head->val);
     if (list->head->prev) printf("Value of prev %d\n", list->head->prev->val);
@@ -42,8 +42,8 @@ void print_list (linked_list * list) {
     list->head = true_head;
 }
 
-void print_head (dl_list_node *head) {
-    dl_list_node *true_head = head;
+void print_head (node *head) {
+    node *true_head = head;
     while (head != NULL) {
         printf("%d\n", head->val);
         if (head->prev) printf("Value of prev %d\n", head->prev->val);
@@ -54,8 +54,8 @@ void print_head (dl_list_node *head) {
 }
 
 void prepend(linked_list *list, int val) {
-    dl_list_node *new_node = create_node(val);
-    dl_list_node **head = &list->head;
+    node *new_node = create_node(val);
+    node **head = &list->head;
     if (!*head) {
         *head = new_node;
         list->tail = new_node;
@@ -68,24 +68,25 @@ void prepend(linked_list *list, int val) {
     *head = new_node;
 }
 
-void append (linked_list *list, int val) {
-    dl_list_node *new_node = create_node(val);
-    dl_list_node **tail = &list->tail;
+node * append (linked_list *list, int val) {
+    node *new_node = create_node(val);
+    node **tail = &list->tail;
     if (!*tail) {
         *tail = new_node;
         list->head = new_node;
         list->length++;
-        return;
+        return new_node;
     }
     list->length++;
     (*tail)->next = new_node;
     new_node->prev = *tail;
     *tail = new_node;
+    return new_node;
 }
 
-dl_list_node* walk_list (linked_list *list, int index) {
+node* walk_list (linked_list *list, int index) {
     // If index is close to the head walk fron the head
-    dl_list_node *head = list->head;
+    node *head = list->head;
     if (index <= list->length / 2) {
         for (int i = 0; i < index; i++) {
             head = head->next;
@@ -93,7 +94,7 @@ dl_list_node* walk_list (linked_list *list, int index) {
         return head;
     }
     // If closer to the end walk back from the tail
-    dl_list_node *tail = list->tail;
+    node *tail = list->tail;
     int steps = list->length - index - 1;
     for (int i = 0; i < steps; i++) {
         tail = tail->prev;
@@ -102,28 +103,28 @@ dl_list_node* walk_list (linked_list *list, int index) {
 }
 
 int get (linked_list *list, int index) {
-    dl_list_node *node = walk_list(list, index);
+    node *node = walk_list(list, index);
     return node->val;
 }
 
 void add_first_node (linked_list *list, int value) {
-    dl_list_node *new_node = create_node(value);
+    node *new_node = create_node(value);
     list->head = new_node;
     list->tail = new_node;
     list->length++;
 }
 
 void insert_at (linked_list *list, int index, int value) {
-    dl_list_node *new_node = create_node(value);
+    node *new_node = create_node(value);
     if (!list->head) { add_first_node(list, value); return; }
     if (index == 0) { prepend(list, value); return; }
     if (index >= list->length) { append(list, value); return; }
-    dl_list_node *node = walk_list(list, index);
+    node *curr_node = walk_list(list, index);
 
-    dl_list_node *prev = node->prev;
+    node *prev = curr_node->prev;
     new_node->prev = prev;
-    new_node->next = node;
-    node->prev = new_node;
+    new_node->next = curr_node;
+    curr_node->prev = new_node;
     prev->next = new_node;
 
     list->length++;
@@ -131,11 +132,11 @@ void insert_at (linked_list *list, int index, int value) {
 }
 
 int remove_value (linked_list *list, int value) {
-    dl_list_node *node = list->head;
-    if (node->val == value) {
+    node *curr_node = list->head;
+    if (curr_node->val == value) {
         list->head = list->head->next;
         list->head->prev = NULL;
-        free(node);
+        free(curr_node);
         return 0;
     }
     if (list->tail->val == value) { 
@@ -144,16 +145,16 @@ int remove_value (linked_list *list, int value) {
         return index;
     }
     int i;
-    for (i = 0; i < list->length && node->val != value; i++) {
-        node = node->next;
+    for (i = 0; i < list->length && curr_node->val != value; i++) {
+        curr_node = curr_node->next;
     }
-    if (!node) {
+    if (!curr_node) {
         return -1;
     }
-    dl_list_node *prev = node->prev;
-    prev->next = node->next;
-    node->next->prev = prev;
-    free(node);
+    node *prev = curr_node->prev;
+    prev->next = curr_node->next;
+    curr_node->next->prev = prev;
+    free(curr_node);
 
     list->length--;
     return i;
@@ -169,8 +170,8 @@ void remove_back (linked_list *list) {
         return;
     }
 
-    dl_list_node *tail = list->tail;
-    dl_list_node *prev = tail->prev;
+    node *tail = list->tail;
+    node *prev = tail->prev;
     prev->next = NULL;
     list->tail = prev;
     free(tail);
@@ -181,19 +182,19 @@ void remove_back (linked_list *list) {
 void remove_at (linked_list *list, int index) {
     if (!list->head) {return;}
     if (index == 0) {
-        dl_list_node *head = list->head;
+        node *head = list->head;
         list->head = list->head->next;
         list->head->prev = NULL;
         free(head);
         return;
     }
     if (index >= list->length - 1) {remove_back(list); return;}
-    dl_list_node *node = walk_list(list, index);
+    node *curr_node = walk_list(list, index);
 
-    dl_list_node *prev = node->prev;
-    prev->next = node->next;
-    node->next->prev = prev;
-    free(node);
+    node *prev = curr_node->prev;
+    prev->next = curr_node->next;
+    curr_node->next->prev = prev;
+    free(curr_node);
 
     list->length--;
     return; 
