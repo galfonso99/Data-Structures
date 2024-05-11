@@ -1,9 +1,8 @@
 //
 //  map.h
 //
-//  Created by Mashpoe on 1/15/21.
+// Hashmap code courtesy of https://github.com/Mashpoe/c-hashmap
 //
-
 #ifndef map_h
 #define map_h
 

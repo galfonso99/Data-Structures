@@ -1,5 +1,5 @@
-main: src/main.c src/map.c src/doubly_linked_list.c
-	zig cc -o main src/main.c src/map.c src/doubly_linked_list.c -I ./src
+main: src/main.c src/hash_map.c 
+	zig cc -o main src/main.c src/hash_map.c -I ./src
 
 
 #src/hash_map.c
