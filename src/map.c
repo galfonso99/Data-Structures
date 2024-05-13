@@ -1,8 +1,6 @@
 //
 //  map.h
 //
-//  Created by Mashpoe on 1/15/21.
-//
 
 #include "map.h"
 #include <stdlib.h>
@@ -374,27 +372,3 @@ void hashmap_iterate(hashmap* m, hashmap_callback c, void* user_ptr)
 		current = current->next;
 	}
 }
-
-/*void bucket_dump(hashmap* m)
-{
-	for (int i = 0; i < m->capacity; i++)
-	{
-		if (m->buckets[i].key == NULL)
-		{
-			if (m->buckets[i].value != 0)
-			{
-				printf("x");
-			}
-			else
-			{
-				printf("0");
-			}
-		}
-		else
-		{
-			printf("1");
-		}
-	}
-	printf("\n");
-	fflush(stdout);
-}*/
