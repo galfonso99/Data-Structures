@@ -47,4 +47,5 @@ void print_entry (int key, int value, void * usr_ptr);
 
 void accumulate_entry (int key, int value, void * usr_ptr);
 
+void hashmap_driver ();
 #endif

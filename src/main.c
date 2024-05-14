@@ -10,7 +10,7 @@
 #define STB_DS_IMPLEMENTATION
 #include "stb_ds.h"
 
-// Create the int-to-int hashmap for C library
-// Do a review and wrap up
 int main (int argc, char **argv) {
+    // Empty because I am finally done
 }
+
